@@ -1,10 +1,10 @@
-# Next.js Workshop Format with Prisma and Podman Deployment
+# Next.js Workshop
 
 ## Workshop Overview
 
-- **Duration**: 4 hours
-- **Objective**: Build a simple blog application using Next.js and Prisma with a local database, and deploy it using Podman.
-- **Prerequisites**: Basic knowledge of JavaScript, React, SQL, and Podman.
+- **Duration**: Roughly 2 hours
+- **Objective**: Build a simple blog application using Next.js and Prisma with a local database, and deploy it using Podman (if we have time).
+- **Prerequisites**: Basic knowledge of JavaScript/Typescript, React, SQL, (podman).
 
 ---
 
@@ -20,24 +20,21 @@
 
 ---
 
-## Step 1: Introduction to Next.js (30 minutes)
+## Step 1: Introduction to Next.js
 
 - **Objective**: Understand what Next.js is and its benefits.
 - **Content**:
-  - What is Next.js?
-  - Key features: Server-side rendering, Static site generation, Server Components, performance
-  - Full-stack type-security
-  - Comparison with React, Svelte(Kit), Angular and .NET.
+  - Presentation
   - Setting up the development environment.
 
 ---
 
-## Step 2: Setting Up the Project (30 minutes)
+## Step 2: Setting Up the Project
 
 - **Objective**: Create a new Next.js project and understand the project structure.
 - **Content**:
   - Install Node.js and npm.
-  - Create a new Next.js project:
+  - Create a new Next.js project (we recommend answering yes to every question that pops up):
     ```bash
     npx create-next-app@latest my-blog
     cd my-blog
@@ -50,7 +47,7 @@
 
 ---
 
-## Step 3: Setting Up Prisma (45 minutes)
+## Step 3: Setting Up Prisma
 
 - **Objective**: Integrate Prisma with the Next.js project and set up a local SQLite database.
 - **Content**:
@@ -92,7 +89,7 @@
 
 ---
 
-## Step 4: Creating Pages (45 minutes)
+## Step 4: Creating Pages
 
 - **Objective**: Create and navigate between pages.
 - **Content**:
@@ -124,7 +121,7 @@
 
 ---
 
-## Step 5: Styling the Application (30 minutes)
+## Step 5: Styling the Application
 
 - **Objective**: Apply global and component-specific styles.
 - **Content**:
@@ -164,7 +161,7 @@
 
 ---
 
-## Step 6: Fetching Data with Prisma (45 minutes)
+## Step 6: Fetching Data with Prisma
 
 - **Objective**: Fetch data from the local database using Prisma.
 - **Content**:
@@ -192,7 +189,7 @@
 
 ---
 
-## Step 7: Dynamic Routes with Prisma (45 minutes)
+## Step 7: Dynamic Routes with Prisma
 
 - **Objective**: Create dynamic routes for individual blog posts.
 - **Content**:
@@ -225,7 +222,7 @@
 
 ---
 
-## Step 8: Creating API Routes with Server Components (45 minutes)
+## Step 8: Creating API Routes with Server Components
 
 - **Objective**: Create server components to handle CRUD operations.
 - **Content**:
@@ -281,7 +278,7 @@
 
 ---
 
-## Step 9: Deploying the Application with Podman (45 minutes)
+## Step 9: Deploying the Application with Podman
 
 - **Objective**: Deploy the Next.js application using Podman.
 - **Content**:
