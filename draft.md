@@ -334,14 +334,10 @@
 
 ---
 
-## Q&A and Wrap-Up (30 minutes)
+## Future work
 
-- **Objective**: Address any questions and summarize the workshop.
-- **Content**:
-  - Open floor for questions.
-  - Recap key points covered in the workshop.
-  - Provide additional resources for learning Next.js, Prisma, and Podman.
-
+* Can swap out the DB with a CMS, like Payload (with integrated Nextjs support in v3)
 
 ## Resources
-NextJS open source github repo: https://github.com/vercel/next.js/ 
+
+NextJS open source github repo: https://github.com/vercel/next.js/

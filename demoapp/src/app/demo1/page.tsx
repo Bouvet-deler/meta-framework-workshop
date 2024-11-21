@@ -13,7 +13,7 @@ export default function Demo1() {
       <p>Client Side Rendering (CSR) vs React Server Component (RSC)</p>
 
       <button className="bg-blue-400 rounded p-8" onClick={() => handleClick()}>
-        Click me to trigger a response on the server{' '}
+        Click me to trigger a response on the server
       </button>
     </div>
   );
