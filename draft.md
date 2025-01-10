@@ -99,7 +99,7 @@
     ```bash
     npx prisma migrate dev
     ```
-  - Generate Prisma Client:
+  - Generate Prisma Client: (if not already done by the migration command above)
 
     ```bash
     npx prisma generate
@@ -108,6 +108,21 @@
   - It is recommended to set these commands as scripts in package.json*
 
     - Requires Prisma as a dev-dependency
+  - It is recommended to use the Prisma Client as a singleton, e.g /src/lib/db.ts:
+
+    ```typescript
+    import { PrismaClient } from '@prisma/client'
+
+    const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+
+    export const prisma =
+      globalForPrisma.prisma || new PrismaClient()
+
+    if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+    ```
+
+    [Database connections | Prisma Documentation
+    ](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections)
 
 ---
 
@@ -155,8 +170,8 @@
 
 - **Objective:** Create a UI where the user can create content to be stored in the database
 - **Content:**
-  - Create a new page or re-use the same page from step 5
-    - An example is to create a new file /admin/page.tsx (authentication can be added on this path)
+  - Create a new page under /app/admin
+    - An example is to create a new file /admin/page.tsx (we will apply simple authentication to all admin routes later)
   - 
 
 ---
@@ -167,27 +182,28 @@
 - **Content**:
 
   - Fetch data at build time using server components (this can be placed in any page you want to):
+    The blogposts can be retrieved as such: (you can exclude the selectors and where clauses, this is taken from the exampleapp branch to highlight its existence)
 
-    ```javascript
-    import { PrismaClient } from '@prisma/client';
+    ```typescript
+    import { prisma } from '@/lib/db';
 
-    const prisma = new PrismaClient();
+    const blogPosts = await prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+      },
+    });
 
-    export default async function Home() {
-      const posts = await prisma.post.findMany();
-
-      return (
-        <div>
-          <h1>Welcome to My Blog</h1>
-          <ul>
-            {posts.map((post) => (
-              <li key={post.id}>{post.title}</li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
     ```
+  - blogPosts is an array of posts, typed correctly adhering to schema.prisma. You can use blogPosts.map(post => `<h1>{post.title}</h1>` to display every blog's title in the database
+  - The post should be in a `<Link>` tag, as clicking on it should navigate to a dynamic route in step 7.
+  - Use Tailwind or shadcn components for styling if you want to
+
+    - Tools like Github Copilot can be useful here!
 
 ---
 
