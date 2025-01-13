@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { prisma } from '@/lib/db';
+import { Button } from '@/components/ui/button';
 
 export default async function HomePage() {
   const blogPosts = await prisma.post.findMany({
@@ -17,6 +18,9 @@ export default async function HomePage() {
   return (
     <div className="container mx-auto p-16">
       <h1 className="text-4xl font-bold mb-8">Welcome to my Blog</h1>
+      <Link href="admin" className='float-right'>
+        <Button variant="outline">Admin Panel</Button>
+      </Link>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {blogPosts.map((blog) => (
           <Link href={`/blog/${blog.id}`} key={blog.id} className="no-underline">
@@ -37,4 +41,3 @@ export default async function HomePage() {
     </div>
   );
 }
-

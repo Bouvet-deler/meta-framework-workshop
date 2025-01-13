@@ -172,7 +172,37 @@
 - **Content:**
   - Create a new page under /app/admin
     - An example is to create a new file /admin/page.tsx (we will apply simple authentication to all admin routes later)
-  - 
+  - Create a simple form that can take a title, content and a checkbox for published.
+    - Tips if you are stuck: Use generative AI, such as Github Copilot, v0.dev, bolt, etc.. or you can take inspiration from the exampleapp branch
+  - You will need both a client component and a server action to do this. The client component is interactive so the user can input data, and the server action is so we can securely add the data to the database.
+    - Implementation of the server action can look something like this:
+    - ```typescript
+      'use server';
+
+      import { prisma } from '@/lib/db';
+
+      export async function createBlog(formData: FormData) {
+        const title = formData.get('title') as string;
+        const content = formData.get('content') as string;
+        const published = formData.get('published') === 'on';
+
+        try {
+          await prisma.post.create({
+            data: {
+              title,
+              content,
+              published,
+            },
+          });
+
+          return { success: true, message: 'Blog created successfully' };
+        } catch (error) {
+          console.error('Failed to create blog:', error);
+          return { success: false, message: 'Failed to create blog' };
+        }
+      }
+
+      ```
 
 ---
 
@@ -207,101 +237,114 @@
 
 ---
 
-## Step 7: Dynamic Routes with Prisma
+## Step 7: Dynamic Routes
 
 - **Objective**: Create dynamic routes for individual blog posts.
 - **Content**:
 
-  - Create a dynamic route (`app/posts/[id]/page.js`):
+  - Let's assume the post only contains the first 10 words of the content, and that the user can click the blog post to open it.
+  - Create a new file at /src/app/blog/[id]/page.tsx
+    - [id] will create a dynamic route. The id will also be consumable as a query parameter in the react component
+    - This file will hold the complete information the user needs for the post, e.g. the entire post content, modified date, creation date etc..
+    - The implementation for getting 1 blog post can look something like this:
+    - ```typescript
+      export default async function BlogPost({ params }: { params: Promise<{ id: string }> }) {
+        const { id } = await params;
 
-    ```javascript
-    import { PrismaClient } from '@prisma/client';
-
-    const prisma = new PrismaClient();
-
-    export async function generateStaticParams() {
-      const posts = await prisma.post.findMany();
-      return posts.map((post) => ({
-        id: post.id.toString(),
-      }));
-    }
-
-    export default async function Post({ params }) {
-      const post = await prisma.post.findUnique({
-        where: { id: parseInt(params.id) },
-      });
-
-      return (
-        <div>
-          <h1>{post.title}</h1>
-          <p>{post.content}</p>
-        </div>
-      );
-    }
-    ```
-
----
-
-## Step 8: Creating API Routes with Server Components
-
-- **Objective**: Create server components to handle CRUD operations.
-- **Content**:
-
-  - Create a server component to fetch all posts (`app/posts/page.js`):
-
-    ```javascript
-    import { PrismaClient } from '@prisma/client';
-
-    const prisma = new PrismaClient();
-
-    export default async function Posts() {
-      const posts = await prisma.post.findMany();
-      return (
-        <div>
-          <h1>All Posts</h1>
-          <ul>
-            {posts.map((post) => (
-              <li key={post.id}>{post.title}</li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
-    ```
-  - Create a server component to create a new post (`app/posts/new/page.js`):
-
-    ```javascript
-    import { PrismaClient } from '@prisma/client';
-
-    const prisma = new PrismaClient();
-
-    export default function NewPost() {
-      async function handleSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const title = formData.get('title');
-        const content = formData.get('content');
-
-        await prisma.post.create({
-          data: { title, content },
+        const blog = await prisma.post.findUnique({
+          where: { id: parseInt(id) },
         });
 
-        // Redirect or update UI
+        if (!blog || !blog.published) {
+          notFound();
+        }
       }
-
-      return (
-        <form onSubmit={handleSubmit}>
-          <input name="title" placeholder="Title" required />
-          <textarea name="content" placeholder="Content" required />
-          <button type="submit">Create Post</button>
-        </form>
-      );
-    }
-    ```
+      ```
+  - Add a not-found.tsx file to catch users that trigger the notFound function, [File Conventions: not-found.js | Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/not-found)
 
 ---
 
-## Step 9: Deploying the Application with Podman
+## Step 8: Modifying existing blog posts
+
+- **Objective**: Create a UI where admins can modify existing blog posts.
+- **Content**:
+  - Create a new page under the /admin route that will display every blog posts, even if they are unpublished, e.g. /app/admin/page.tsx can be an index page for the admin interface
+  - Clicking on a blog post should navigate to a new page where the user can edit the blog post
+    - The admin user should be able to edit, publish and delete the blog post
+    - The edit page can be created at /app/admin/edit/[id]/page.tsx
+
+---
+
+## Step 9: Adding simple authentication to our admin routes
+
+- **Objective**: Prompt the user to log in before they can access the admin routes.
+- **Content**:
+  - We can add a simple authentication check to the admin routes by using a middleware function
+
+    - Middlewares must be at the root of the project, /src/middleware.ts
+  - A simple middleware that checks the HTTP header for authentication can look something like this:
+  - ```typescript
+    import { NextRequest, NextResponse } from 'next/server';
+
+    export async function middleware(req: NextRequest) {
+      if ((await isAuthenticated(req)) === false) {
+        return new NextResponse('Unauthorized', {
+          status: 401,
+          headers: { 'WWW-Authenticate': 'Basic' },
+        });
+      }
+    }
+
+    async function isAuthenticated(req: NextRequest) {
+      const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+
+      if (authHeader == null) return false;
+
+      const [username, password] = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+
+      return (
+        username === process.env.ADMIN_USERNAME &&
+        (await isValidPassword(password, process.env.HASHED_ADMIN_PASSWORD as string))
+      );
+    }
+
+    export const config = {
+      matcher: '/admin/:path*',
+    };
+
+    ```
+
+    This requires 2 environment variables in a .env file, "ADMIN_USERNAME" and "HASHED_ADMIN_PASSWORD". If these were prefixed with NEXT_PUBLIC, they could also be used in a client component (used for public secrets) [Configuring: Environment Variables | Next.js](https://nextjs.org/docs/app/building-your-application/configuring/environment-variables)
+
+    Take note of the config object, that uses a matcher to apply this middleware to just routes under the /admin route.
+
+    These helper functions using in-built crypto libraries in JS can help you authenticate
+
+    ```typescript
+    export async function isValidPassword(password: string, hashedPassword: string) {
+      return (await hashPassword(password)) === hashedPassword;
+    }
+
+    async function hashPassword(password: string) {
+      const arrayBuffer = await crypto.subtle.digest('SHA-512', new TextEncoder().encode(password));
+
+      return Buffer.from(arrayBuffer).toString('base64');
+    }
+
+    ```
+
+    In this example, the password stored in the .env file is hashed. You can hash your password using SHA-512, or using the hashpassword function, e.g. `let hashedPassword = hashPassword("myPassword");`
+  - Disclaimer: In a real project, we do not recommend rolling your own auth. This is to demonstrate middleware capabilities and the interaction between client and server. There are plenty of open source options that provide compatibility with auth providers, such as Azure AD( Entra ID), BankID, Firebase....
+
+    - Some examples for Next.js are [NextAuth.js](https://next-auth.js.org/) (which will soon become [Auth.js | Authentication for the Web](https://authjs.dev/)), [Clerk | Authentication and User Management](https://clerk.com/)
+  - For project structuring reasons, you can use route groups to group e.g. public facing and admin routes
+
+    - E.g. /app/(public) and /app/(admin)/admin/page.tsx
+    - [Route groups](https://nextjs.org/docs/app/building-your-application/routing/route-groups)
+
+---
+
+## Step 10: Deploying the Application with Podman
 
 - **Objective**: Deploy the Next.js application using Podman.
 - **Content**:
@@ -360,6 +403,10 @@
 
 ## Future work
 
+- Add not found and error pages.
+- Add authentication to server actions.
+- Add authentication implementation with an auth library, e.g. next-auth, authjs, Clerk..
+- Deploy the application to a cloud provider like Vercel, AWS or Azure, or look at self-hosting options
 - Can swap out the DB with a CMS, like Payload (with integrated Nextjs support in v3)
 
 ## Resources
