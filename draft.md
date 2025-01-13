@@ -3,24 +3,8 @@
 ## Workshop Overview
 
 - **Duration**: Roughly 2 hours
-- **Objective**: Build a simple blog application using Next.js and Prisma with a local database, and deploy it using Podman (if we have time).
-- **Prerequisites**: Basic knowledge of JavaScript/Typescript, React, SQL, (podman).
-
----
-
-## TODO - Add the following sections
-
-- Security
-  - SRC is just a normal HTTP call, need proper security
-  - Authentication with Clerk, can mention
-    - If time, we can add role based authentication with Clerk.....???
-    - Or with Authjs and Azure...
-- Middleware (can demonstrate this with a simple auth check and an admin panel)
-  - Add middleware to check if the user is authenticated
-    - Create a new step on this
-- Forms!
-  - Add a form to create a new post
-  - Type checking with zod, full stack type checking
+- **Objective**: Build a simple blog application using Next.js and Prisma with a local database.
+- **Prerequisites**: Basic knowledge of JavaScript/Typescript, React
 
 ---
 
@@ -272,6 +256,9 @@
   - Clicking on a blog post should navigate to a new page where the user can edit the blog post
     - The admin user should be able to edit, publish and delete the blog post
     - The edit page can be created at /app/admin/edit/[id]/page.tsx
+    - Use prisma.post.update|delete|create method to alter the data in database
+    - Use the revalidatePath in server actions to update the UI after the database transaction have completed.
+    - The type for the blogPost can be inferred from Prisma, e.g. `type Post = Prisma.PostGetPayload<object>;`
 
 ---
 
@@ -333,8 +320,8 @@
 
     ```
 
-    In this example, the password stored in the .env file is hashed. You can hash your password using SHA-512, or using the hashpassword function, e.g. `let hashedPassword = hashPassword("myPassword");`
-  - Disclaimer: In a real project, we do not recommend rolling your own auth. This is to demonstrate middleware capabilities and the interaction between client and server. There are plenty of open source options that provide compatibility with auth providers, such as Azure AD( Entra ID), BankID, Firebase....
+    In this example, the password stored in the .env file is hashed. You can hash your password using SHA-512, or using the hashPassword function, e.g. `let hashedPassword = hashPassword("myPassword");`
+  - Disclaimer: In a real project, we do not recommend rolling your own auth. This is to demonstrate middleware capabilities and the interaction between client and server. There are plenty of open source options that provide compatibility with auth providers, such as Azure AD (Entra ID), BankID, Firebase....
 
     - Some examples for Next.js are [NextAuth.js](https://next-auth.js.org/) (which will soon become [Auth.js | Authentication for the Web](https://authjs.dev/)), [Clerk | Authentication and User Management](https://clerk.com/)
   - For project structuring reasons, you can use route groups to group e.g. public facing and admin routes
@@ -344,7 +331,9 @@
 
 ---
 
-## Step 10: Deploying the Application with Podman
+<!-- Hidden step because we might not have time -->
+
+<!-- ## Step 10: Deploying the Application with Podman 
 
 - **Objective**: Deploy the Next.js application using Podman.
 - **Content**:
@@ -399,11 +388,12 @@
     podman-compose up --build
     ```
 
----
+--- -->
 
 ## Future work
 
 - Add not found and error pages.
+- Add a complex form, and validate using e.g. zod. Use this to use the same code to validate both on the client and the server for better ease of use, security and maintenability.
 - Add authentication to server actions.
 - Add authentication implementation with an auth library, e.g. next-auth, authjs, Clerk..
 - Deploy the application to a cloud provider like Vercel, AWS or Azure, or look at self-hosting options
