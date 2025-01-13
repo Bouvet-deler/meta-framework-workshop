@@ -392,7 +392,7 @@
 
 ## Future work
 
-- Add not found and error pages.
+- Add not found and error pages/boundaries.
 - Add a complex form, and validate using e.g. zod. Use this to use the same code to validate both on the client and the server for better ease of use, security and maintenability.
 - Add authentication to server actions.
 - Add authentication implementation with an auth library, e.g. next-auth, authjs, Clerk..
