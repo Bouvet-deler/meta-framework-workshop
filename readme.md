@@ -22,7 +22,7 @@
 - **Objective**: Create a new Next.js project and understand the project structure.
 - **Content**:
   - Install Node.js and npm.
-  - Create a new Next.js project (we recommend answering yes to every question that pops up, workshop alias can be anything):
+  - Create a new Next.js project (we recommend answering the default (just press enter) to every question that pops up):
     ```bash
     npx create-next-app@latest my-blog
     cd my-blog
@@ -32,11 +32,11 @@
     - `app/`: Contains the application components and pages.
     - `public/`: Static assets like images.
     - `styles/`: CSS files.
-  - Set correct tsconfig for more linting help
+  - Set correct tsconfig for more linting help (optional)
+    - Make sure a typescript file is open while opening command palette
+    - Make sure tsconfig is at the root of the Visual Studio Code project open
     - In Visual Studio Code, open command palette (SHIFT+CTRL+P), type "select typescript version" and select it, and chose "Use workspace version"
-      - Make sure a typescript file is open while opening command palette
-      - Make sure tsconfig is at the root of the Visual Studio Code project open
-    - This adds some specific rules relevant to Next.js
+    - This adds some specific rules relevant to Next.js that can warn about errors before compiling
 
 ---
 
@@ -89,9 +89,19 @@
     npx prisma generate
     ```
   - Notice the changes in the Prisma folder, there is now a local db file and .sql migrations files
-  - It is recommended to set these commands as scripts in package.json*
+  - It is recommended to set these commands as scripts in package.json
 
     - Requires Prisma as a dev-dependency
+    - ```
+        "scripts": {
+          "dev": "next dev --turbopack",
+          "build": "next build",
+          "start": "next start",
+          "lint": "next lint",
+          "migrate": "prisma migrate dev"
+        },
+
+      ```
   - It is recommended to use the Prisma Client as a singleton, e.g /src/lib/db.ts:
 
     ```typescript
@@ -147,6 +157,27 @@
   - Or programmatically using the useRouter hook in a client component or redirect in a server component
 
     - More can be found here: [Routing: Linking and Navigating | Next.js](https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating)
+  - There exists a number of file conventions in Next.js that serve different purpose: (you can find more information about a specific file in the Next.js documentation)
+
+    ```
+    1. page.js / page.tsx: This file defines the unique UI of a route .
+    2. layout.js / layout.tsx: This file defines UI that is shared between multiple pages .
+    3. loading.js / loading.tsx: This file creates a loading UI that is shown while page content is loading .
+    4. error.js / error.tsx: This file defines an error UI boundary for a route segment .
+    5. not-found.js / not-found.tsx: This file creates a UI to show when the notFound function is thrown within a route segment or when a URL is not matched by any route .
+    6. route.js / route.ts: This file is used to create API endpoints and is the equivalent of API Routes in the pages directory .
+    7. template.js / template.tsx: Similar to layout, but creates a new instance for each of their children on navigation .
+    8. default.js / default.tsx: This file defines fallback UI for Parallel Routes .
+
+
+    These files are part of what Next.js calls "Special Files" in the App Router. They have reserved names and specific purposes within the routing system.
+
+    Additionally, there are other conventions:
+
+    9. global-error.js / global-error.tsx: This provides a global error UI at the root of your application .
+    10. middleware.ts: This file allows you to run code before a request is completed .
+    11. _components, _lib, _styles, etc.: Folders starting with an underscore are private folders, used to colocate files with routes without affecting routing .
+    ```
 
 ---
 
@@ -244,7 +275,7 @@
         }
       }
       ```
-  - Add a not-found.tsx file to catch users that trigger the notFound function, [File Conventions: not-found.js | Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/not-found)
+  - (Optional) Add a not-found.tsx file to catch users that trigger the notFound function, [File Conventions: not-found.js | Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/not-found)
 
 ---
 
